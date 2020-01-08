@@ -4,6 +4,7 @@ const moment = require("moment");
 let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 let doLoop = true;
+let allowedToLoad = true;
 
 init();
 async function init(){
@@ -11,7 +12,9 @@ async function init(){
     console.log(msg);
     let nextSleep = 6;
     while(doLoop){
-        loadPage();
+        if (allowedToLoad){
+            loadPage();
+        }
         await sleep(nextSleep * 1000);
         nextSleep = 2 + Math.floor(Math.random() * 5);
     }
@@ -24,15 +27,25 @@ function loadPage(){
         path: '/lottery_cart.php?camp_id=9',
         method: 'GET'
     };
+
+    allowedToLoad = false;
     const req = https.request(options, res => {
         //console.log(`Status: ${res.statusCode}.`);
         res.on("data", d => {
+            allowedToLoad = true;
             //process.stdout.write(d);
             if (d.includes("leider keine") || d.includes(" kein ")){
                 console.log(`${moment()}: no tickets.`);
             }else{
-                console.log(res.statusCode + ". maybe a ticket? " + d);
+                console.log(res.statusCode + ". Maybe a ticket?");
+                if (d.includes("campaign-man-select")){
+                    console.log("Keyword has been found!");
+                }else{
+                    console.log("Probably not a ticket: " + d);
+                }
+
                 open("https://www.intersport.at/skitag/gratis-tickets", {app: ["chrome"]});
+                open("assets/ode_to_joy.mp3");
                 doLoop = false;
             }
         });
@@ -40,6 +53,7 @@ function loadPage(){
     
     req.on("error", e => {
         console.log(`Error happened: ${e}`);
+        allowedToLoad = true;
     });
     
     req.end();
