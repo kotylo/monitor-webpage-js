@@ -11,9 +11,19 @@ async function init(){
     var msg = 'Hello World. Starting!';
     console.log(msg);
     let nextSleep = 6;
+    let notLoadedCount = 0;
     while(doLoop){
         if (allowedToLoad){
+            notLoadedCount = 0;
             loadPage();
+        }else{
+            notLoadedCount++;
+        }
+
+        if (notLoadedCount > 5){
+            // reset loading 
+            console.log("Not loaded count is too high, try loading again...");
+            allowedToLoad = true;
         }
         await sleep(nextSleep * 1000);
         nextSleep = 2 + Math.floor(Math.random() * 5);
