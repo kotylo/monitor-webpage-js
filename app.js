@@ -5,11 +5,11 @@ let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 let doLoop = true;
 let allowedToLoad = true;
+const pauseCount = 5;
 
 init();
 async function init(){
-    var msg = 'Hello World. Starting!';
-    console.log(msg);
+    console.log("Hello World. Starting!");
     let nextSleep = 6;
     let notLoadedCount = 0;
     while(doLoop){
@@ -17,12 +17,13 @@ async function init(){
             notLoadedCount = 0;
             loadPage();
         }else{
+            console.log(`Making a pause ${notLoadedCount} of ${pauseCount}...`);
             notLoadedCount++;
         }
 
-        if (notLoadedCount > 5){
+        if (notLoadedCount > pauseCount){
             // reset loading 
-            console.log("Not loaded count is too high, try loading again...");
+            console.log(`Not loaded count is too high (${pauseCount}), try loading again...`);
             allowedToLoad = true;
         }
         await sleep(nextSleep * 1000);
@@ -35,16 +36,19 @@ function loadPage(){
         hostname: 'intersport.traumgutscheine.com',
         port: 443,
         path: '/lottery_cart.php?camp_id=9',
-        method: 'GET'
+        method: 'GET',
+        timeout: 500 // sometimes timeout indicates success too
     };
 
     allowedToLoad = false;
+
+    let startTime = moment();
     const req = https.request(options, res => {
         //console.log(`Status: ${res.statusCode}.`);
         res.on("data", d => {
             allowedToLoad = true;
             //process.stdout.write(d);
-            if (d.includes("leider keine") || d.includes(" kein ")){
+            if (d.includes("leider keine") || d.includes("diesmal kein ")){
                 console.log(`${moment()}: no tickets.`);
             }else{
                 console.log(res.statusCode + ". Maybe a ticket?");
@@ -54,17 +58,31 @@ function loadPage(){
                     console.log("Probably not a ticket: " + d);
                 }
 
-                open("https://www.intersport.at/skitag/gratis-tickets", {app: ["chrome"]});
-                open("assets/ode_to_joy.mp3");
+                successAction();
                 doLoop = false;
+                allowedToLoad = false;
             }
         });
     });
     
     req.on("error", e => {
         console.log(`Error happened: ${e}`);
-        allowedToLoad = true;
+    });
+
+    req.on("timeout", e => {
+        let timePassed = moment() - startTime;
+        console.log(`Timeout happened, time ${timePassed}: ${e}`);
+        req.abort();
+
+        // open the website just in case
+        successAction();
+        allowedToLoad = false;
     });
     
     req.end();
+}
+
+function successAction() {
+    open("https://www.intersport.at/skitag/gratis-tickets", { app: ["chrome"] });
+    open("assets/ode_to_joy.mp3");
 }
