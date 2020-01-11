@@ -6,4 +6,4 @@ Node JS sample app to monitor a webpage and open Chrome if keyword detected
 
 # Running
     
-    > node app.js
+    > npm start

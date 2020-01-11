@@ -1,0 +1,25 @@
+{
+  "name": "monitor-webpage",
+  "version": "1.0.0",
+  "description": "Monitors website for a keyword",
+  "main": "app.js",
+  "dependencies": {
+    "moment": "^2.24.0",
+    "open": "^7.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kotylo/monitor-webpage-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kotylo/monitor-webpage-js/issues"
+  },
+  "homepage": "https://github.com/kotylo/monitor-webpage-js#readme"
+}
