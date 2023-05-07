@@ -4,7 +4,7 @@
   "description": "Monitors website for a keyword",
   "main": "app.js",
   "dependencies": {
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "open": "^7.0.0"
   },
   "devDependencies": {},
